@@ -1,18 +1,15 @@
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
-WORKDIR /src
-COPY ["BelenLibraryNowAPI/BelenLibraryNowAPI.csproj", "BelenLibraryNowAPI/"]
-RUN dotnet restore "BelenLibraryNowAPI/BelenLibraryNowAPI.csproj"
-COPY . .
-WORKDIR "/src/BelenLibraryNowAPI"
-RUN dotnet build "BelenLibraryNowAPI.csproj" -c Release -o /app/build
-
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS publish
-WORKDIR /src
-COPY --from=build /app/build .
-RUN dotnet publish "BelenLibraryNowAPI.csproj" -c Release -o /app/publish
-
-FROM mcr.microsoft.com/dotnet/aspnet:7.0
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base 
 WORKDIR /app
-COPY --from=publish /app/publish .
-EXPOSE 80
-ENTRYPOINT ["dotnet", "BelenLibraryNowAPI.dll"]
+EXPOSE 8080
+ENV ASPNETCORE_URLS=http://+:8080
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+COPY . .
+RUN dotnet restore "BelenLibraryNowAPI/BelenLibraryNowAPI.csproj"
+RUN dotnet publish "BelenLibraryNowAPI/BelenLibraryNowAPI.csproj" -c Release -o /app/out
+
+FROM base AS final
+WORKDIR /app
+COPY --from=build /app/out .
+ENTRYPOINT ["dotnet", "BelenLibraryNowApi.dll"]
