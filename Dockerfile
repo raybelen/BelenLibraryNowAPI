@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base 
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 EXPOSE 8080
 ENV ASPNETCORE_URLS=http://+:8080
@@ -12,4 +12,4 @@ RUN dotnet publish "BelenLibraryNowAPI/BelenLibraryNowAPI.csproj" -c Release -o 
 FROM base AS final
 WORKDIR /app
 COPY --from=build /app/out .
-ENTRYPOINT ["dotnet", "BelenLibraryNowApi.dll"]
+ENTRYPOINT ["dotnet", "BelenLibraryNowAPI.dll"]
